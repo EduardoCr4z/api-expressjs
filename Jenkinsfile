@@ -38,14 +38,17 @@ pipeline {
     stage('Compute ports & names') {
       steps {
         script {
-          // Deterministic port calculation from instance name using CRC32 to avoid collisions.
-          def name = params.INSTANCE_NAME
+          def name = params.INSTANCE_NAME ?: "default"
+
           def crc = new java.util.zip.CRC32()
           crc.update(name.getBytes("UTF-8"))
-          def mod = (crc.getValue() % 1000) as int   // 0..999
+
+          def mod = (crc.getValue() % 1000) as int
+
           env.BACKEND_PORT = (4000 + mod).toString()
           env.MYSQL_PORT = (6000 + mod).toString()
           env.CONTAINER_SUFFIX = name.replaceAll("[^a-zA-Z0-9_-]", "_")
+
           echo "Instance: ${name} -> backend host port ${env.BACKEND_PORT}, mysql host port ${env.MYSQL_PORT}"
         }
       }
