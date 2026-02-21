@@ -68,23 +68,35 @@ pipeline {
           sh 'chmod +x render_vars.sh'
           // Render docker-compose.j2 to docker-compose.yml using envsubst approach
           sh """
-            source ./render_vars.sh
-            python3 - <<'PY'
-            import os, sys
-            from jinja2 import Template
-            # Render docker-compose.j2
-            with open('docker-compose.j2') as f:
-                tpl = Template(f.read())
-            with open('docker-compose.yml','w') as out:
-                out.write(tpl.render(instance_name=os.environ['INSTANCE_NAME'], container_suffix=os.environ['CONTAINER_SUFFIX'], backend_port=os.environ['BACKEND_PORT'], mysql_port=os.environ['MYSQL_PORT']))
-            # Render .env.j2
-            with open('.env.j2') as f:
-                tpl = Template(f.read())
-            with open('.env','w') as out:
-                out.write(tpl.render(instance_name=os.environ['INSTANCE_NAME']))
-            print("Rendered docker-compose.yml and .env")
-            PY
-            """
+source ./render_vars.sh
+python3 - <<'PY'
+import os
+from jinja2 import Template
+
+# Render docker-compose.j2
+with open('docker-compose.j2') as f:
+    tpl = Template(f.read())
+
+with open('docker-compose.yml','w') as out:
+    out.write(tpl.render(
+        instance_name=os.environ['INSTANCE_NAME'],
+        container_suffix=os.environ['CONTAINER_SUFFIX'],
+        backend_port=os.environ['BACKEND_PORT'],
+        mysql_port=os.environ['MYSQL_PORT']
+    ))
+
+# Render .env.j2
+with open('.env.j2') as f:
+    tpl = Template(f.read())
+
+with open('.env','w') as out:
+    out.write(tpl.render(
+        instance_name=os.environ['INSTANCE_NAME']
+    ))
+
+print("Rendered docker-compose.yml and .env")
+PY
+"""
         }
       }
     }
