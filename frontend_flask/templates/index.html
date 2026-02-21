@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="login-container container mt-5">
-        <form id="instanceForm">
+        <form id="instanceForm" method="POST" action="/solicitar"">
             <div class="form-group">
                 <label>Correo</label>
                 <input type="email" name="correo" class="form-control" placeholder="Correo" required>
@@ -21,23 +21,6 @@
             <br><br>
             <button type="submit" class="btn btn-primary">Solicitar</button>
         </form>
-
-        <script>
-            document.getElementById("instanceForm").addEventListener("submit", async (e) => {
-               e.preventDefault();
-               
-               const correo = e.target.correo.value;
-               const instancia = e.target.instancia.value
-
-               await fetch("/crear-instancia", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ correo, instancia })
-               });
-
-               alert("Solicitud enviada");
-            });
-        </script>
     </div>
 </body>
 </html>
