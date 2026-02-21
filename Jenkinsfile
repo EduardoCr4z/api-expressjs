@@ -159,9 +159,7 @@ python3 render.py
 
   post {
     failure {
-      mail to: "${params.EMAIL}",
-           subject: "Fallo despliegue instancia ${params.INSTANCE_NAME}",
-           body: "El despliegue de ${params.INSTANCE_NAME} falló. Revisa Jenkins."
+      echo "Deployment failed"
     }
   }
 }
