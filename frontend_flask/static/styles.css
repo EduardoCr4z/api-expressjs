@@ -1,0 +1,18 @@
+/* Caja login */
+.login-container {
+  background: white;
+  padding: 40px;
+  width: 320px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Fondo y centrado */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center; /* horizontal */
+  align-items: center;     /* vertical */
+  background: #f4f6f9;
+}

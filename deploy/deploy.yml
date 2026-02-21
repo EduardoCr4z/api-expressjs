@@ -1,0 +1,95 @@
+---
+- name: Desplegar backend-node instance
+  hosts: webservers
+  become: yes
+  vars:
+    instance_name: "{{ instance_name | default('instance') }}"
+    remote_base_dir: "{{ remote_base_dir | default('/opt/instances') }}"
+    instance_dir: "{{ remote_base_dir }}/{{ instance_name }}"
+  tasks:
+    - name: Asegurarse que el directorio inicial exista
+      file:
+        path: "{{ remote_base_dir }}"
+        state: directory
+        mode: '0755'
+        owner: root
+
+    - name: Asegurarse que el directorio de la instancia exista
+      file:
+        path: "{{ instance_dir }}"
+        state: directory
+        mode: '0755'
+        owner: root
+
+    - name: Copiar docker-compose.yml al workspace de Jenkins
+      copy:
+        src: ./docker-compose.yml
+        dest: "{{ instance_dir }}/docker-compose.yml"
+        owner: root
+        mode: '0644'
+
+    - name: Copiar .env al servidor
+      copy:
+        src: ./.env
+        dest: "{{ instance_dir }}/.env"
+        owner: root
+        mode: '0600'
+
+    - name: Crear directorio para mysql
+      file:
+        path: "{{ instance_dir }}/mysql_data"
+        state: directory
+        mode: '0755'
+        owner: root
+
+    - name: Asegurarse que docker compose esta disponible
+      block:
+        - name: Verificar comando docker compose
+          ansible.builtin.command: docker compose version
+          register: docker_compose_check
+          ignore_errors: true
+
+        - name: Verificar comando docker-compose
+          ansible.builtin.command: docker-compose version
+          when: docker_compose_check.rc != 0
+          register: docker_compose_check2
+          ignore_errors: true
+
+      rescue:
+        - name: Mensaje de error
+          fail:
+            msg: "No esta instalado ni docker compose ni docker-compose"
+
+    - name: Correr comando docker compose up
+      ansible.builtin.shell: |
+        set -e
+        cd "{{ instance_dir }}"
+        if docker compose version >/dev/null 2>&1; then
+          docker compose pull
+        else
+          docker-compose pull
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Correr docker compose up -d
+      ansible.builtin.shell: |
+        set -e
+        cd "{{ instance_dir }}"
+        if docker compose version >/dev/null 2>&1; then
+          docker compose up -d --remove-orphans
+        else
+          docker-compose up -d --remove-orphans
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Esperar despliegue
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: "{{ backend_port | default(4000) }}"
+        state: started
+        delay: 2
+        timeout: 20
+      delegate_to: localhost
+      run_once: true
