@@ -71,7 +71,7 @@ pipeline {
 import os
 from jinja2 import Template
 
-with open('docker-compose.j2') as f:
+with open('deploy/docker-compose.j2') as f:
     tpl = Template(f.read())
 
 with open('docker-compose.yml','w') as out:
@@ -82,7 +82,7 @@ with open('docker-compose.yml','w') as out:
         mysql_port=os.environ['MYSQL_PORT']
     ))
 
-with open('.env.j2') as f:
+with open('deploy/.env.j2') as f:
     tpl = Template(f.read())
 
 with open('.env','w') as out:
