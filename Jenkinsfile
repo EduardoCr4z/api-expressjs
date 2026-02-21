@@ -67,13 +67,10 @@ pipeline {
                                                         """ 
           sh 'chmod +x render_vars.sh'
           // Render docker-compose.j2 to docker-compose.yml using envsubst approach
-          sh """
-source ./render_vars.sh
-python3 - <<'PY'
+         writeFile file: 'render.py', text: '''
 import os
 from jinja2 import Template
 
-# Render docker-compose.j2
 with open('docker-compose.j2') as f:
     tpl = Template(f.read())
 
@@ -85,7 +82,6 @@ with open('docker-compose.yml','w') as out:
         mysql_port=os.environ['MYSQL_PORT']
     ))
 
-# Render .env.j2
 with open('.env.j2') as f:
     tpl = Template(f.read())
 
@@ -95,8 +91,12 @@ with open('.env','w') as out:
     ))
 
 print("Rendered docker-compose.yml and .env")
-PY
-"""
+'''
+
+sh '''
+source ./render_vars.sh
+python3 render.py
+'''
         }
       }
     }
