@@ -131,26 +131,25 @@ python3 render.py
 
           // Send email via Mailtrap using stored Jenkins creds (username/password)
           withCredentials([usernamePassword(credentialsId: env.MAILTRAP_CRED_ID, usernameVariable: 'MAILTRAP_USER', passwordVariable: 'MAILTRAP_PASS')]) {
-            sh """
-              python3 - <<PY
-                import smtplib, os
-                from email.message import EmailMessage
-                msg = EmailMessage()
-                msg['Subject'] = 'API desplegada: ${params.INSTANCE_NAME}'
-                msg['From'] = 'no-reply@example.com'
-                msg['To'] = '${params.EMAIL}'
-                body = f\"La API está disponible en: http://{env.REMOTE_HOST}:{env.BACKEND_PORT}/\\nInstancia: ${params.INSTANCE_NAME}\"
-                msg.set_content(body)
-                # Mailtrap SMTP (default port 2525)
-                smtp_user = os.environ['MAILTRAP_USER']
-                smtp_pass = os.environ['MAILTRAP_PASS']
-                s = smtplib.SMTP('smtp.mailtrap.io', 2525)
-                s.login(smtp_user, smtp_pass)
-                s.send_message(msg)
-                s.quit()
-                print('Email sent to ${params.EMAIL}')
-                PY
-                """
+writeFile file: 'send_email.py', text: '''
+import smtplib
+import os
+from email.mime.text import MIMEText
+
+msg = MIMEText("Deployment successful")
+msg['Subject'] = "Deployment status"
+msg['From'] = "deploy@test.com"
+msg['To'] = "test@test.com"
+
+server = smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525)
+server.starttls()
+server.login(os.environ['MAILTRAP_USER'], os.environ['MAILTRAP_PASS'])
+server.send_message(msg)
+server.quit()
+
+print("Email sent successfully")
+'''
+sh "python3 send_email.py"
           }
         }
       }
