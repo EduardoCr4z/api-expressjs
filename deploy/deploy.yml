@@ -9,7 +9,7 @@
   tasks:
     - name: Asegurarse que el directorio inicial exista
       file:
-        path: "{{ remote_base_dir }}"
+        path: "{{ remote_base_dir }}/ {{ instance_name }}"
         state: directory
         mode: '0755'
         owner: root

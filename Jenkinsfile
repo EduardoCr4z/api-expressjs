@@ -104,18 +104,22 @@ python3 render.py
     stage('Run Ansible deploy') {
       steps {
         sshagent (credentials: [env.SSH_KEY_ID]) {
-          sh """
-            cat > inventory.ini <<EOF
+          sh '''
+    cat > inventory.ini <<EOF
     [webservers]
-    ${env.REMOTE_HOST} ansible_user=${env.REMOTE_USER}
+    5.189.179.95 ansible_user=eduardo ansible_ssh_common_args='-o StrictHostKeyChecking=no'
     EOF
 
-            ansible-playbook -i inventory.ini deploy.yml \
-              --extra-vars "instance_name=${params.INSTANCE_NAME} \
-              backend_port=${env.BACKEND_PORT} \
-              mysql_port=${env.MYSQL_PORT} \
-              remote_base_dir=${env.REMOTE_BASE_DIR}"
-          """
+    echo "===== INVENTORY ====="
+    cat inventory.ini
+    echo "====================="
+
+    ansible-playbook -i inventory.ini deploy.yml \
+      --extra-vars "instance_name=prueba_instancia \
+      backend_port=4245 \
+      mysql_port=6245 \
+      remote_base_dir=/opt/instances" -vvv
+    '''
         }
       }
     }
