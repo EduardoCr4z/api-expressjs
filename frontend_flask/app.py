@@ -61,7 +61,7 @@ def solicitar():
             return f"Error al disparar Jenkins: {response.status_code}"
 
         return f"""
-        <h3>Solicitud enviada correctamente 🚀</h3>
+        <h3>Solicitud enviada correctamente</h3>
         <p>Instancia: {instancia}</p>
         <p>Correo destino: {correo_destino}</p>
         <p>Jenkins status: {response.status_code}</p>
