@@ -10,7 +10,7 @@ pipeline {
     SSH_KEY_ID = 'deploy-ssh-key'         // ssh private key credential (type: SSH Username with private key OR secret file)
     MAILTRAP_CRED_ID = 'mailtrap-creds'  // username/password credential in Jenkins
     ANSIBLE_INVENTORY = 'inventory.ini'  // si tienes inventory en repo, lo usaremos; si no, lo generamos.
-    REMOTE_BASE_DIR = "/opt/instances"   // base path remoto donde se crearán las instancias
+    REMOTE_BASE_DIR = "/opt/apps/eduardo"   // base path remoto donde se crearán las instancias
     REMOTE_HOST = "5.189.179.95"
     REMOTE_USER = "eduardo"
   }
