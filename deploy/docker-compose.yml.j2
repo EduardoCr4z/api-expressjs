@@ -2,20 +2,27 @@ services:
   backend:
     build:
       context: ./backend_node
-    container_name: backend_{{ instance_name }}
+    container_name: backend_prueba_instancia
     restart: always
     env_file:
-      - .env
-    depends_on:
-      - mysql_{{ instance_name }}
-
-  mysql_{{ instance_name }}:
-    image: mysql:8
-    container_name: mysql_{{ instance_name }}
+      - ./backend_node/.env
     ports:
-      - "{{ mysql_port }}:3306"
+      - "4001:4000"
+    depends_on:
+      - mysql_prueba_instancia
+
+  mysql_prueba_instancia:
+    image: mysql:8
+    container_name: mysql_prueba_instancia
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: asignaciones
+    ports:
+      - "6701:3306"
     volumes:
-      - ./mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+      - ./backend_node/script_bd.sql:/docker-entrypoint-initdb.d/script_bd.sql
+
+volumes:
+  mysql_data:
