@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import requests
 import os
+from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Cambiar en producción
@@ -11,7 +12,10 @@ app.secret_key = "supersecretkey"  # Cambiar en producción
 
 JENKINS_URL = os.getenv("JENKINS_URL", "http://localhost:8080")
 JOB_NAME = os.getenv("JOB_NAME", "deploy-backend")
-JENKINS_TRIGGER_TOKEN = os.getenv("JENKINS_TRIGGER_TOKEN", "1171b9756c17f161957cbeaa3556a1b32a")
+JENKINS_TRIGGER_TOKEN = os.getenv("JENKINS_TRIGGER_TOKEN", "deploytoken123")
+
+JENKINS_USER = os.getenv("JENKINS_USER", "admin")
+JENKINS_API_TOKEN = os.getenv("JENKINS_API_TOKEN", "1171b9756c17f161957cbeaa3556a1b32a")
 
 
 # ---------------------------
@@ -42,10 +46,16 @@ def solicitar():
         params = {
             "INSTANCE_NAME": instancia,
             "EMAIL": correo_destino,
-            "token": JENKINS_TRIGGER_TOKEN
         }
 
-        response = requests.post(job_url, params=params)
+        response = requests.post(
+            f"{JENKINS_URL}/job/{JOB_NAME}/buildWithParameters",
+            params={
+                "INSTANCE_NAME": instancia,
+                "EMAIL": correo_destino
+            },
+            auth=HTTPBasicAuth(JENKINS_USER, JENKINS_API_TOKEN)
+        )
 
         if response.status_code not in [200, 201]:
             return f"Error al disparar Jenkins: {response.status_code}"
