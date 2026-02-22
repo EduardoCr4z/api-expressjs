@@ -1,29 +1,22 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 import requests
-from requests.auth import HTTPBasicAuth
-import smtplib
-from email.mime.text import MIMEText
+import os
 
 app = Flask(__name__)
+app.secret_key = "supersecretkey"  # Cambiar en producción
 
 # ---------------------------
 # CONFIGURACIÓN JENKINS
 # ---------------------------
 
-JENKINS_URL = "http://localhost:8080"
-JOB_NAME = "deploy-backend"
-JENKINS_USER = "admin"
-JENKINS_TOKEN = "1171b9756c17f161957cbeaa3556a1b32a"
+JENKINS_URL = os.getenv("JENKINS_URL", "http://localhost:8080")
+JOB_NAME = os.getenv("JOB_NAME", "deploy-backend")
+JENKINS_TRIGGER_TOKEN = os.getenv("JENKINS_TRIGGER_TOKEN", "1171b9756c17f161957cbeaa3556a1b32a")
+
 
 # ---------------------------
-# CONFIGURACIÓN CORREO (Mailtrap)
+# ROUTES
 # ---------------------------
-
-SMTP_SERVER = "sandbox.smtp.mailtrap.io"
-SMTP_PORT = 2525
-SMTP_USER = "a6d8d3fd454e60"
-SMTP_PASS = "70ce65ef699dd8"
-
 
 @app.route('/')
 def index():
@@ -32,79 +25,40 @@ def index():
 
 @app.route('/solicitar', methods=['POST'])
 def solicitar():
-    instancia = request.form['instancia']
-    correo_destino = request.form['correo']
+    instancia = request.form.get('instancia')
+    correo_destino = request.form.get('correo')
+
+    if not instancia or not correo_destino:
+        flash("Todos los campos son obligatorios.")
+        return redirect(url_for('index'))
 
     try:
         # ---------------------------
-        # 1️⃣ ENVIAR CORREO
-        # ---------------------------
-
-        mensaje = f"""
-Hola,
-
-Tu solicitud fue recibida correctamente.
-
-Instancia solicitada: {instancia}
-
-Gracias por usar nuestro sistema.
-        """
-
-        msg = MIMEText(mensaje)
-        msg['Subject'] = "Solicitud de instancia"
-        msg['From'] = "no-reply@miapp.com"
-        msg['To'] = correo_destino
-
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.login(SMTP_USER, SMTP_PASS)
-            server.send_message(msg)
-
-        # ---------------------------
-        # 2️⃣ OBTENER CRUMB DE JENKINS
-        # ---------------------------
-
-        crumb_response = requests.get(
-            f"{JENKINS_URL}/crumbIssuer/api/json",
-            auth=HTTPBasicAuth(JENKINS_USER, JENKINS_TOKEN)
-        )
-
-        if crumb_response.status_code != 200:
-            return f"Error obteniendo crumb: {crumb_response.status_code}"
-
-        crumb_data = crumb_response.json()
-        crumb = crumb_data['crumb']
-        crumb_field = crumb_data['crumbRequestField']
-
-        headers = {
-            crumb_field: crumb
-        }
-
-        # ---------------------------
-        # 3️⃣ DISPARAR JOB EN JENKINS
+        # DISPARAR JOB EN JENKINS
         # ---------------------------
 
         job_url = f"{JENKINS_URL}/job/{JOB_NAME}/buildWithParameters"
 
         params = {
             "INSTANCE_NAME": instancia,
-            "EMAIL": correo_destino
+            "EMAIL": correo_destino,
+            "token": JENKINS_TRIGGER_TOKEN
         }
 
-        response = requests.post(
-            job_url,
-            params=params,
-            headers=headers,
-            auth=HTTPBasicAuth(JENKINS_USER, JENKINS_TOKEN)
-        )
+        response = requests.post(job_url, params=params)
+
+        if response.status_code not in [200, 201]:
+            return f"Error al disparar Jenkins: {response.status_code}"
 
         return f"""
-Solicitud enviada correctamente<br>
-Correo enviado a: {correo_destino}<br>
-Jenkins status: {response.status_code}
+        <h3>Solicitud enviada correctamente 🚀</h3>
+        <p>Instancia: {instancia}</p>
+        <p>Correo destino: {correo_destino}</p>
+        <p>Jenkins status: {response.status_code}</p>
         """
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error inesperado: {str(e)}"
 
 
 if __name__ == '__main__':
