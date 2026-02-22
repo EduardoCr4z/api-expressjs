@@ -21,6 +21,11 @@
         backend_port: "{{ 4000 + (instance_name | hash('md5') | int(base=16) % 1000) }}"
         mysql_port: "{{ 6000 + (instance_name | hash('md5') | int(base=16) % 1000) }}"
 
+    - name: Copiar contenido real del backend
+      copy:
+        src: ../backend_node/
+        dest: "{{ remote_base_dir }}/{{ instance_name }}/backend_node/"
+
     - name: Render docker-compose
       template:
         src: docker-compose.yml.j2
