@@ -11,7 +11,7 @@ pipeline {
     MAILTRAP_CRED_ID = 'mailtrap-creds'
     REMOTE_HOST = "5.189.179.95"
     REMOTE_USER = "eduardo"
-    REMOTE_BASE_DIR = "/opt/apps"
+    REMOTE_BASE_DIR = "/home/eduardo"
   }
 
   stages {
