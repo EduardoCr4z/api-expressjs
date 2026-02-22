@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - "4001:4000"
+      - "3306/tcp"
     depends_on:
       - mysql_prueba_instancia
 
@@ -19,7 +19,7 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: asignaciones
     ports:
-      - "6701:3306"
+      - "3306/tcp"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend_node/script_bd.sql:/docker-entrypoint-initdb.d/script_bd.sql
