@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./backend_node
-    container_name: backend_prueba_instancia
+    container_name: backend_{{ instance_name }}
     restart: always
     env_file:
       - .env
@@ -13,7 +13,7 @@ services:
 
   mysql_prueba_instancia:
     image: mysql:8
-    container_name: mysql_prueba_instancia
+    container_name: mysql_{{ instance_name }}
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
