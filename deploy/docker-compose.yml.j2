@@ -5,7 +5,7 @@ services:
     container_name: backend_prueba_instancia
     restart: always
     env_file:
-      - ./backend_node/.env
+      - .env
     ports:
       - "4001:4000"
     depends_on:
