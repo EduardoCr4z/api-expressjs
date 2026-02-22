@@ -1,9 +1,9 @@
 services:
-  backend_{{ instance_name }}:
-    build: ./backend_node
+  backend:
+    build:
+      context: ./backend_node
     container_name: backend_{{ instance_name }}
-    ports:
-      - "{{ backend_port }}:4000"
+    restart: always
     env_file:
       - .env
     depends_on:
