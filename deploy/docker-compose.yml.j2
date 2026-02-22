@@ -1,6 +1,6 @@
 services:
   backend_{{ instance_name }}:
-    build: ../../backend_node
+    build: ./backend_node
     container_name: backend_{{ instance_name }}
     ports:
       - "{{ backend_port }}:4000"
