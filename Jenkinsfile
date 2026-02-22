@@ -103,25 +103,20 @@ python3 render.py
 
     stage('Run Ansible deploy') {
       steps {
-        // Use SSH key stored in Jenkins. We assume ansible is installed on the agent.
-        sshagent (credentials: [env.SSH_KEY_ID]) {
-            sh """
-                ssh -o StrictHostKeyChecking=no -v eduardo@5.189.179.95 exit
-            """
-        }
-        /*
         sshagent (credentials: [env.SSH_KEY_ID]) {
           sh """
-            # copy inventory if exists in repo or create a dynamic inventory
             cat > inventory.ini <<EOF
-            [webservers]
-            ${env.REMOTE_HOST} ansible_user=${env.REMOTE_USER}
-            EOF
+    [webservers]
+    ${env.REMOTE_HOST} ansible_user=${env.REMOTE_USER}
+    EOF
 
-            ansible-playbook -i inventory.ini deploy.yml --extra-vars "instance_name=${params.INSTANCE_NAME} backend_port=${env.BACKEND_PORT} mysql_port=${env.MYSQL_PORT} remote_base_dir=${env.REMOTE_BASE_DIR}"
+            ansible-playbook -i inventory.ini deploy.yml \
+              --extra-vars "instance_name=${params.INSTANCE_NAME} \
+              backend_port=${env.BACKEND_PORT} \
+              mysql_port=${env.MYSQL_PORT} \
+              remote_base_dir=${env.REMOTE_BASE_DIR}"
           """
         }
-        */
       }
     }
 
