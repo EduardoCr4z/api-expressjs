@@ -18,7 +18,7 @@
 
     - name: Calcular puertos dinámicos
       set_fact:
-        backend_port: "{{ 4000 + (instance_name | hash('md5') | int(base=16) % 1000) }}"
+        backend_port: "{{ 17000 + (instance_name | hash('md5') | int(base=16) % 101) }}"
         mysql_port: "{{ 6000 + (instance_name | hash('md5') | int(base=16) % 1000) }}"
 
     - name: Copiar contenido real del backend
