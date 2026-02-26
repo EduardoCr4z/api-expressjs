@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     ports:
-      - "{{ backend_port }}:4000"
+      - "9000:4000"
     depends_on:
       - mysql_prueba_instancia
 
