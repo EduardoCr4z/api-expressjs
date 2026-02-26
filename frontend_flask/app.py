@@ -4,11 +4,7 @@ import os
 from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Cambiar en producción
-
-# ---------------------------
-# CONFIGURACIÓN JENKINS
-# ---------------------------
+app.secret_key = "supersecretkey" 
 
 JENKINS_URL = os.getenv("JENKINS_URL", "http://localhost:8080")
 JOB_NAME = os.getenv("JOB_NAME", "deploy-backend")
@@ -17,10 +13,6 @@ JENKINS_TRIGGER_TOKEN = os.getenv("JENKINS_TRIGGER_TOKEN", "deploytoken123")
 JENKINS_USER = os.getenv("JENKINS_USER", "admin")
 JENKINS_API_TOKEN = os.getenv("JENKINS_API_TOKEN", "1171b9756c17f161957cbeaa3556a1b32a")
 
-
-# ---------------------------
-# ROUTES
-# ---------------------------
 
 @app.route('/')
 def index():
@@ -37,10 +29,6 @@ def solicitar():
         return redirect(url_for('index'))
 
     try:
-        # ---------------------------
-        # DISPARAR JOB EN JENKINS
-        # ---------------------------
-
         job_url = f"{JENKINS_URL}/job/{JOB_NAME}/buildWithParameters"
 
         params = {

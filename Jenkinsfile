@@ -22,20 +22,20 @@ pipeline {
       }
     }
 
-    stage('Validate parameters') {
+    stage('Validacion de parámetros') {
       steps {
         script {
           if (!params.INSTANCE_NAME) {
-            error "INSTANCE_NAME is required"
+            error "Se requiere INSTANCE_NAME"
           }
           if (!params.EMAIL) {
-            error "EMAIL is required"
+            error "Se requiere EMAIL"
           }
         }
       }
     }
 
-    stage('Deploy with Ansible') {
+    stage('Despliegue con Ansible') {
       steps {
         sshagent(credentials: [env.SSH_KEY_ID]) {
           sh """
@@ -55,10 +55,10 @@ pipeline {
 
   post {
     success {
-      echo "Deployment successful"
+      echo "Despliegue exitoso"
     }
     failure {
-      echo "Deployment failed"
+      echo "Fallo despliegue"
     }
   }
 }
