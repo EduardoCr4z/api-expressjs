@@ -9,9 +9,9 @@ pipeline {
   environment {
     SSH_KEY_ID = 'deploy-ssh-key'
     MAILTRAP_CRED_ID = 'mailtrap-creds'
-    REMOTE_HOST = "5.189.179.95"
-    REMOTE_USER = "eduardo"
-    REMOTE_BASE_DIR = "/home/eduardo"
+    REMOTE_HOST = "192.168.3.22"
+    REMOTE_USER = "jcruz"
+    REMOTE_BASE_DIR = "/home/jcruz"
   }
 
   stages {
